@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en-CA">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Free Pet Profile and Pet Addendum Generator | QuickCasa</title>
+    <meta
+      name="description"
+      content="Make a free pet profile PDF for your rental application, then turn it into a pet addendum for the lease. No account, no fee, and nothing leaves your browser." />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./main.ts"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="https://quickcasa.ai"
+          >QuickCasa <span>Pet Profile</span></a
+        >
+        <nav aria-label="Project links">
+          <a href="https://github.com/QuickCasa/pet-profile">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <h1>Free pet profile and pet addendum generator</h1>
+          <p class="lede">
+            Renters, make a pet profile to send with your rental application.
+            Landlords, turn it into a pet addendum for the lease. Both are free
+            PDFs, with no account, and nothing you enter leaves your browser.
+          </p>
+        </div>
+      </section>
+
+      <div class="wrap">
+        <div class="banner" id="share-banner" hidden>
+          <p>
+            <strong>This link has a pet profile in it.</strong> Loading it
+            replaces the profile on this page. Photos aren't included in links.
+          </p>
+          <div class="actions">
+            <button
+              type="button"
+              class="button button-primary"
+              id="load-shared">
+              Load the profile
+            </button>
+            <button
+              type="button"
+              class="button button-secondary"
+              id="ignore-shared">
+              Ignore it
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <form id="form" class="wrap stack" novalidate>
+        <h2 class="part">For renters: your pet profile</h2>
+
+        <fieldset class="panel">
+          <legend><span class="step">1</span> About you</legend>
+          <div class="grid">
+            <label class="field">
+              <span>Your name</span>
+              <textarea
+                data-profile="owners"
+                rows="2"
+                autocomplete="name"
+                aria-describedby="owners-hint"></textarea>
+              <small id="owners-hint"
+                >One name per line, for everyone on the application.</small
+              >
+            </label>
+            <div class="stack-small">
+              <label class="field">
+                <span>Phone</span>
+                <input data-profile="phone" type="tel" autocomplete="tel" />
+              </label>
+              <label class="field">
+                <span>Email</span>
+                <input data-profile="email" type="email" autocomplete="email" />
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="panel">
+          <legend><span class="step">2</span> Your pets</legend>
+          <div id="pets" class="stack"></div>
+          <div class="actions">
+            <button type="button" class="button button-secondary" id="add-pet">
+              Add another pet
+            </button>
+          </div>
+        </fieldset>
+
+        <fieldset class="panel">
+          <legend><span class="step">3</span> Contacts and insurance</legend>
+          <p class="hint">
+            All optional. Leave out anything you'd rather not share.
+          </p>
+          <div class="grid">
+            <label class="field">
+              <span>Emergency contact for your pets</span>
+              <textarea
+                data-profile="emergencyContact"
+                rows="3"
+                placeholder="Someone who can care for your pets if you can't, and how to reach them"></textarea>
+            </label>
+            <label class="field">
+              <span>References</span>
+              <textarea
+                data-profile="references"
+                rows="3"
+                placeholder="A past landlord, pet sitter or trainer, and how to reach them"></textarea>
+            </label>
+            <label class="field">
+              <span>Renter's insurance</span>
+              <textarea
+                data-profile="insurance"
+                rows="3"
+                placeholder="Your insurer, and whether your policy covers pet liability"></textarea>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="panel panel-actions">
+          <div class="actions">
+            <button
+              type="button"
+              class="button button-primary"
+              id="download-profile">
+              Download the pet profile PDF
+            </button>
+            <button
+              type="button"
+              class="button button-secondary"
+              id="copy-link">
+              Copy a link for your landlord
+            </button>
+          </div>
+          <p class="hint" id="profile-status" aria-live="polite"></p>
+          <label class="field" id="share-link-field" hidden>
+            <span>Your link</span>
+            <input id="share-link" readonly />
+          </label>
+        </div>
+
+        <h2 class="part">For landlords: the pet addendum</h2>
+        <p class="part-lede">
+          The addendum lists the pets from the profile above. If a renter sent
+          you a link, open it and load their profile first.
+        </p>
+
+        <fieldset class="panel">
+          <legend><span class="step">4</span> The lease</legend>
+          <div class="grid">
+            <label class="field">
+              <span>Landlord or company</span>
+              <input data-addendum="landlord" autocomplete="organization" />
+            </label>
+            <label class="field">
+              <span>Rental address and unit</span>
+              <input data-addendum="address" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>Tenants</span>
+              <textarea
+                data-addendum="tenants"
+                rows="2"
+                aria-describedby="tenants-hint"></textarea>
+              <small id="tenants-hint"
+                >One per line. Leave blank to use the names from the
+                profile.</small
+              >
+            </label>
+            <label class="field">
+              <span>Takes effect on</span>
+              <input data-addendum="effectiveDate" type="date" />
+            </label>
+          </div>
+          <div class="pet-summary">
+            <h3>Pets</h3>
+            <ul id="addendum-pets"></ul>
+          </div>
+        </fieldset>
+
+        <fieldset class="panel">
+          <legend><span class="step">5</span> Charges (optional)</legend>
+          <p class="hint">
+            Pet deposits and pet fees aren't allowed everywhere. Check your
+            local rules before adding one. Anything left blank stays off the
+            addendum.
+          </p>
+          <div class="grid" id="charges">
+            <label class="field">
+              <span>Pet deposit</span>
+              <input data-addendum="deposit" />
+            </label>
+            <label class="field">
+              <span>One-time pet fee</span>
+              <input data-addendum="fee" />
+            </label>
+            <label class="field">
+              <span>Monthly pet rent</span>
+              <input data-addendum="monthlyRent" />
+            </label>
+          </div>
+          <p class="hint" id="assistance-note" hidden></p>
+        </fieldset>
+
+        <fieldset class="panel">
+          <legend><span class="step">6</span> Terms</legend>
+          <p class="hint">
+            These are a starting point. Edit, remove or add terms to match your
+            lease.
+          </p>
+          <ol id="clauses" class="clauses"></ol>
+          <div class="actions">
+            <button
+              type="button"
+              class="button button-secondary"
+              id="add-clause">
+              Add a term
+            </button>
+            <button
+              type="button"
+              class="button button-secondary"
+              id="reset-clauses">
+              Reset to the starting terms
+            </button>
+          </div>
+        </fieldset>
+
+        <div class="panel panel-actions">
+          <div class="actions">
+            <button
+              type="button"
+              class="button button-primary"
+              id="download-addendum">
+              Download the pet addendum PDF
+            </button>
+          </div>
+          <p class="hint" id="addendum-status" aria-live="polite"></p>
+        </div>
+
+        <div class="privacy">
+          <p>
+            Everything you enter is saved in this browser so it's here when you
+            come back. None of it is uploaded anywhere.
+          </p>
+          <button type="button" class="button button-secondary" id="start-over">
+            Start over
+          </button>
+          <p class="hint" id="storage-status" aria-live="polite"></p>
+        </div>
+      </form>
+
+      <section class="wrap prose">
+        <h2>Before anyone signs</h2>
+        <p>
+          The addendum is a starting point, not legal advice. Rules on pets, pet
+          deposits and pet fees differ by province, state and city, and some
+          places don't allow pet deposits or fees at all. Check the final
+          version against your local rules before anyone signs it.
+        </p>
+        <p>
+          Many places also don't allow deposits, fees or pet rent for service
+          and support animals. If a pet is marked as one, the addendum leaves
+          those charges off for it.
+        </p>
+
+        <h2>Why it's free</h2>
+        <p>
+          Some pet screening services charge renters a fee for every pet. This
+          tool is free, needs no account and doesn't score your pet. It's open
+          source, so anyone can check that your information stays in your
+          browser.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>
+          Built by <a href="https://quickcasa.ai">QuickCasa</a> in Kitchener,
+          Ontario. MIT licensed, with the source on
+          <a href="https://github.com/QuickCasa/pet-profile">GitHub</a>.
+        </p>
+      </div>
+    </footer>
+
+    <template id="pet-template">
+      <article class="pet">
+        <header class="pet-header">
+          <h3 class="pet-title"></h3>
+          <button type="button" class="remove" data-action="remove-pet">
+            Remove
+          </button>
+        </header>
+        <div class="pet-body">
+          <div class="photo">
+            <img class="photo-preview" alt="" hidden />
+            <div class="photo-empty">No photo yet</div>
+            <label class="button button-secondary photo-button">
+              <span class="photo-button-label">Add a photo</span>
+              <input
+                type="file"
+                accept="image/*"
+                class="visually-hidden"
+                data-action="photo" />
+            </label>
+            <button
+              type="button"
+              class="link-button"
+              data-action="remove-photo"
+              hidden>
+              Remove photo
+            </button>
+          </div>
+          <div class="pet-fields">
+            <div class="grid">
+              <label class="field">
+                <span>Name</span>
+                <input data-pet-field="name" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>Animal</span>
+                <select data-pet-field="type">
+                  <option value="dog">Dog</option>
+                  <option value="cat">Cat</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+              <label class="field other-type" hidden>
+                <span>What kind of animal?</span>
+                <input data-pet-field="otherType" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>Breed</span>
+                <input data-pet-field="breed" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>Colour and markings</span>
+                <input data-pet-field="colour" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>Sex</span>
+                <select data-pet-field="sex">
+                  <option value="">Not given</option>
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Spayed or neutered</span>
+                <select data-pet-field="spayedOrNeutered">
+                  <option value="">Not given</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Age</span>
+                <input
+                  data-pet-field="age"
+                  autocomplete="off"
+                  placeholder="4 years" />
+              </label>
+              <div class="field">
+                <span>Weight</span>
+                <div class="inline">
+                  <input
+                    data-pet-field="weight"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    aria-label="Weight" />
+                  <select data-pet-field="weightUnit" aria-label="Weight unit">
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                  </select>
+                </div>
+              </div>
+              <label class="field">
+                <span>Microchip number</span>
+                <input data-pet-field="microchip" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>Licence or tag number</span>
+                <input data-pet-field="licence" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>Last rabies vaccine</span>
+                <input data-pet-field="rabiesDate" type="date" />
+              </label>
+              <label class="field">
+                <span>Other vaccines</span>
+                <input data-pet-field="vaccinations" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>Vet clinic</span>
+                <input
+                  data-pet-field="vet"
+                  autocomplete="off"
+                  placeholder="Name and phone number" />
+              </label>
+            </div>
+            <fieldset class="traits">
+              <legend>Temperament and training</legend>
+              <label class="check"
+                ><input type="checkbox" data-pet-trait="houseTrained" /> House
+                trained</label
+              >
+              <label class="check"
+                ><input type="checkbox" data-pet-trait="crateTrained" /> Crate
+                trained</label
+              >
+              <label class="check"
+                ><input type="checkbox" data-pet-trait="goodWithDogs" /> Good
+                with dogs</label
+              >
+              <label class="check"
+                ><input type="checkbox" data-pet-trait="goodWithCats" /> Good
+                with cats</label
+              >
+              <label class="check"
+                ><input type="checkbox" data-pet-trait="goodWithChildren" />
+                Good with children</label
+              >
+            </fieldset>
+            <label class="check assistance">
+              <input type="checkbox" data-pet-field="assistanceAnimal" />
+              This is a service or support animal
+            </label>
+            <label class="field">
+              <span>Anything else a landlord should know</span>
+              <textarea
+                data-pet-field="notes"
+                rows="3"
+                placeholder="Training classes, daily routine, how they do when left alone"></textarea>
+            </label>
+          </div>
+        </div>
+      </article>
+    </template>
+  </body>
+</html>

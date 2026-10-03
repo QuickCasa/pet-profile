@@ -1,0 +1,46 @@
+{
+  "name": "pet-profile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A free, open source pet profile and pet addendum generator. Renters make a pet profile PDF, landlords turn it into a pet addendum, and nothing leaves the browser.",
+  "homepage": "https://quickcasa.github.io/pet-profile/",
+  "bugs": {
+    "url": "https://github.com/QuickCasa/pet-profile/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QuickCasa/pet-profile.git"
+  },
+  "license": "MIT",
+  "author": "QuickCasa (https://quickcasa.ai)",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 8791",
+    "typecheck": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run typecheck && npm test && npm run lint && npm run build"
+  },
+  "dependencies": {
+    "jspdf": "^4.2.1"
+  },
+  "devDependencies": {
+    "@quickcasa/eslint-config": "^1.0.0",
+    "@types/node": "^22.20.5",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "eslint": "^10.12.0",
+    "jsdom": "^30.1.1",
+    "prettier": "^3.9.9",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}
