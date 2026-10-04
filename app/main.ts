@@ -1,3 +1,4 @@
+import '@fontsource-variable/space-grotesk/wght.css'
 import './styles.css'
 import { applyPetField } from './apply-pet-field.js'
 import { renderClauses } from './clauses-editor.js'
